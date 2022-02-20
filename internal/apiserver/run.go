@@ -8,7 +8,5 @@ func Run(cfg *config.Config) error {
 		return err
 	}
 
-	server.PrepareRun()
-
-	return nil
+	return server.PrepareRun().Run()
 }

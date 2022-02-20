@@ -1,5 +1,7 @@
 package app
 
+import "log"
+
 type App struct {
 	basename    string
 	name        string
@@ -23,6 +25,15 @@ func NewApp(name string, basename string, opts ...Option) *App {
 	}
 
 	return a
+}
+
+func (a *App) Run() {
+	// run application
+	if a.runFunc != nil {
+		if err := a.runFunc(a.basename); err != nil {
+			log.Println(err.Error())
+		}
+	}
 }
 
 func WithSilence() Option {
@@ -58,5 +69,3 @@ func WithRunFunc(run RunFunc) Option {
 		a.runFunc = run
 	}
 }
-
-

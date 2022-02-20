@@ -20,8 +20,8 @@ type InsecureServingInfo struct {
 
 type SecureServingInfo struct {
 	BindAddress string
-	BindPort int
-	CertKey  CertKey
+	BindPort    int
+	CertKey     CertKey
 }
 
 func (s *SecureServingInfo) Address() string {
@@ -35,8 +35,9 @@ type CertKey struct {
 
 func NewConfig() *Config {
 	return &Config{
-		Healthz: true,
-		Mode:    gin.ReleaseMode,
+		Healthz:     true,
+		Mode:        gin.DebugMode,
+		Middlewares: []string{},
 	}
 }
 

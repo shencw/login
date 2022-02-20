@@ -24,7 +24,6 @@ func (s *apiServer) PrepareRun() preparedAPIServer {
 
 	s.gs.AddShutdownCallback(shutdown.OnShutdownFunc(func(string) error {
 		s.genericAPIServer.Close()
-
 		return nil
 	}))
 
@@ -40,8 +39,13 @@ func (p preparedAPIServer) Run() error {
 }
 
 func createAPIServer(cfg *config.Config) (*apiServer, error) {
+	log.Println("创建api server")
+
 	gs := shutdown.New()
 	gs.AddShutdownManager(posixsignal.NewPosixSignalManager())
+	gs.SetErrorHandler(shutdown.ErrorFunc(func(err error) {
+		log.Printf("shutdown.ErrorFunc:%s", err.Error())
+	}))
 
 	genericConfig, err := buildGenericConfig(cfg)
 	if err != nil {
@@ -51,6 +55,7 @@ func createAPIServer(cfg *config.Config) (*apiServer, error) {
 	genericServer, err := genericConfig.Completed().New()
 
 	apiServer := &apiServer{
+		gs:               gs,
 		genericAPIServer: genericServer,
 	}
 
@@ -61,6 +66,14 @@ func buildGenericConfig(cfg *config.Config) (*genericAPIServer.Config, error) {
 	genericConfig := genericAPIServer.NewConfig()
 
 	if err := cfg.GenericServerRunOptions.ApplyTo(genericConfig); err != nil {
+		return genericConfig, err
+	}
+
+	if err := cfg.InsecureServing.ApplyTo(genericConfig); err != nil {
+		return genericConfig, err
+	}
+
+	if err := cfg.SecureServing.ApplyTo(genericConfig); err != nil {
 		return genericConfig, err
 	}
 

@@ -1,6 +1,9 @@
 package shutdown
 
-import "sync"
+import (
+	"log"
+	"sync"
+)
 
 // Callback 是Shutdown时回调的接口
 type Callback interface {
@@ -70,6 +73,10 @@ func (gs *GracefulShutdown) AddShutdownCallback(shutdownCallback Callback) {
 	gs.callbacks = append(gs.callbacks, shutdownCallback)
 }
 
+func (gs *GracefulShutdown) SetErrorHandler(errorHandler ErrorHandler) {
+	gs.errorHandler = errorHandler
+}
+
 // StartShutdown 发起Shutdown操作
 // 1. 调用 ShutdownStart
 // 2. 依次执行回调
@@ -82,11 +89,13 @@ func (gs *GracefulShutdown) StartShutdown(sm Manager) {
 		wg.Add(1)
 		go func(shutdownCallback Callback) {
 			defer wg.Done()
+			log.Println("over1")
 
 			gs.ReportError(shutdownCallback.OnShutdown(sm.GetName()))
 		}(shutdownCallback)
 	}
-	wg.Done()
+	wg.Wait()
+	log.Println("over2")
 
 	gs.ReportError(sm.ShutdownFinish())
 }

@@ -6,12 +6,16 @@ import (
 )
 
 type Options struct {
-	GenericServerRunOptions *genericoptions.ServerRunOptions `json:"server"   mapstructure:"server"`
+	GenericServerRunOptions *genericoptions.ServerRunOptions       `json:"server"   mapstructure:"server"`
+	InsecureServing         *genericoptions.InsecureServingOptions `json:"insecure" mapstructure:"insecure"`
+	SecureServing           *genericoptions.SecureServingOptions   `json:"secure"   mapstructure:"secure"`
 }
 
 func NewOptions() *Options {
 	return &Options{
 		GenericServerRunOptions: genericoptions.NewServerRunOptions(),
+		InsecureServing:         genericoptions.NewInsecureServingOptions(),
+		SecureServing:           genericoptions.NewSecureServingOptions(),
 	}
 }
 

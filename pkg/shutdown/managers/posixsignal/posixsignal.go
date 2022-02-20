@@ -2,6 +2,7 @@ package posixsignal
 
 import (
 	"github.com/shencw/login/pkg/shutdown"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,6 +44,7 @@ func (m *Manager) ShutdownStart() error {
 }
 
 func (m *Manager) ShutdownFinish() error {
+	log.Println("finish")
 	os.Exit(0)
 
 	return nil
